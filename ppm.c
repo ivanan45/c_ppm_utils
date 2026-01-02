@@ -1,7 +1,6 @@
 #include "ppm.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 
 PPM_Image* PPM_read(const char* filepath) {
 	FILE* fp = fopen(filepath, "rb");
@@ -25,16 +24,19 @@ PPM_Image* PPM_read(const char* filepath) {
 	}
 
 	// Check that the format is set correctly (P6)
-	if (strcmp(buf, "P6\n") != 0) {
+	if (buf[0] != 'P' || buf[1] != '6') {
 		fprintf(stderr, "Invalid format!\n");
 		free(img);
 		return NULL;
 	}
 
 	// Skip the comment
-	if (getc(fp) == '#') {
+	int c = getc(fp);
+	while (c == '#') {
 		while (getc(fp) != '\n');
+		c = getc(fp);
 	}
+	ungetc(c, fp);
 
 	// Get width, height and maxval
 	fscanf(fp, "%d %d", &img->width, &img->height);
