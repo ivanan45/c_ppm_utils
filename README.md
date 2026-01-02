@@ -7,7 +7,7 @@
 2. Proceed with general CMake building process
 ```shell
 cd /path/to/project/
-mkdir build
+mkdir build && cd build
 cmake ..
 cmake --build .
 ```
