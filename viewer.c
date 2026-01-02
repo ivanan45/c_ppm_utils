@@ -1,6 +1,6 @@
 #include "ppm.h"
+#include <SDL2/SDL.h>
 #include <stdio.h>
-#include <string.h>
 
 int main(int argc, char* argv[]) {
 	// Filename not provided
@@ -15,10 +15,30 @@ int main(int argc, char* argv[]) {
 		return -2;
 	}
 
-	for (int i = 0; i < img->width * img->height; i++) {
-		printf("%d %d %d\n", img->data[i].r, img->data[i].g, img->data[i].b);
+	// Basic SDL2 init
+	SDL_Init(SDL_INIT_VIDEO);
+	SDL_Window* window = SDL_CreateWindow(argv[1], SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+			img->width, img->height, 0);
+	SDL_Surface* win_surf = SDL_GetWindowSurface(window);
+
+	SDL_Rect pixel = { .x = 0, .y = 0, .w = 1, .h = 1 };
+	for (int y = 0; y < img->height; y++) {
+		for (int x = 0; x < img->width; x++) {
+			pixel.x = x;
+			pixel.y = y;
+
+			PPM_Pixel tmp = img->data[y * img->width + x];
+			Uint32 color = SDL_MapRGB(win_surf->format, tmp.r, tmp.g, tmp.b);
+
+			SDL_FillRect(win_surf, &pixel, color);
+		}
 	}
 
+	SDL_UpdateWindowSurface(window);
+
+	SDL_Delay(4000);
+
+	printf("%d %d\n", img->width, img->height);
 	PPM_free(img);
 	return 0;
 }
